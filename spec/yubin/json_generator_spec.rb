@@ -30,4 +30,16 @@ describe Yubin::JsonGenerator do
     }
     it { FileTest.exist?(basepath + '/' + '37kagawa.csv').should be_true }
   end
+
+  describe ".generate" do
+    let(:filename) { fixture_path('37kagawa.csv') }
+    it { Yubin::JsonGenerator.generate(filename) }
+  end
+
+  describe ".to_json_string" do
+    context "" do
+      let(:data) { ["37201", "760  ", "7600000", "ｶｶﾞﾜｹﾝ", "ﾀｶﾏﾂｼ", "ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ", "香川県", "高松市", "以下に掲載がない場合", "0", "0", "0", "0", "0", "0"] }
+      it { Yubin::JsonGenerator.to_json_string(data).tapp }
+    end
+  end
 end
