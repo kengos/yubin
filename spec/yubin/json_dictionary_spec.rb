@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Yubin::JsonGenerator do
+describe Yubin::JsonDictionary do
   let(:basepath) { TMP_DIR + '/tests' }
 
   before {
@@ -17,7 +17,7 @@ describe Yubin::JsonGenerator do
     let(:filename) { basepath + '/' + 'test.zip' }
     let(:uri) { 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/37kagawa.zip' }
     before {
-      Yubin::JsonGenerator.download(uri, filename) 
+      Yubin::JsonDictionary.download(uri, filename) 
     }
     it { FileTest.exist?(filename).should be_true }
   end
@@ -26,20 +26,23 @@ describe Yubin::JsonGenerator do
     let(:filename) { fixture_path('37kagawa.zip') }
     before {
       FileUtils.rm_r(basepath) if FileTest.exist?(basepath)
-      Yubin::JsonGenerator.unzip(filename, basepath)
+      Yubin::JsonDictionary.unzip(filename, basepath)
     }
     it { FileTest.exist?(basepath + '/' + '37kagawa.csv').should be_true }
   end
 
-  describe ".generate" do
+  describe ".generate_tmpfile" do
     let(:filename) { fixture_path('37kagawa.csv') }
-    it { Yubin::JsonGenerator.generate(filename) }
+    before {
+      Yubin::JsonDictionary.generate_tmpfile(filename, basepath)
+    }
+    it { FileTest.exist?(basepath + '/' + '760.txt').should be_true }
   end
 
-  describe ".to_json_string" do
+  describe ".parse" do
     context "" do
       let(:data) { ["37201", "760  ", "7600000", "ｶｶﾞﾜｹﾝ", "ﾀｶﾏﾂｼ", "ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ", "香川県", "高松市", "以下に掲載がない場合", "0", "0", "0", "0", "0", "0"] }
-      it { Yubin::JsonGenerator.to_json_string(data).tapp }
+      it { Yubin::JsonDictionary.parse(data).should == {"7600000" => ['香川県', 'カガワケン', '高松市', 'タカマツシ', '', '']} }
     end
   end
 end
