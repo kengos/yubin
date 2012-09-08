@@ -1,5 +1,6 @@
 require "yubin/version"
 
 module Yubin
-  # Your code goes here...
+  autoload :JsonGenerator, 'yubin/json_generator'
+  autoload :Parser, 'yubin/parser'
 end
