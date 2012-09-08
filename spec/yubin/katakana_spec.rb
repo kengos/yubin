@@ -7,7 +7,7 @@ describe Yubin::Katakana do
   it { Yubin::Katakana::VOICELESS.size.should eql 55 }
 
   it 'should convert HANKAKU' do
-    Yubin::Katakana.to_hankaku('Cambodia カンボジア かんぼじあ').tapp.should eql 'Cambodia ｶﾝﾎﾞｼﾞｱ かんぼじあ'
+    Yubin::Katakana.to_hankaku('Cambodia カンボジア かんぼじあ').should eql 'Cambodia ｶﾝﾎﾞｼﾞｱ かんぼじあ'
   end
 
   it 'should convert ZENKAKU' do
