@@ -36,7 +36,7 @@ describe Yubin::JsonDictionary do
     before {
       Yubin::JsonDictionary.generate_tmpfile(filename, basepath)
     }
-    it { FileTest.exist?(basepath + '/' + '760.txt').should be_true }
+    it { FileTest.exist?(basepath + '/' + '760.yml').should be_true }
   end
 
   describe ".parse" do

@@ -7,6 +7,7 @@ module Yubin
     require 'zip/zip'
     require 'csv'
     require 'json'
+    require 'yaml'
 
     ZIP_CODE_INDEX = 2
     PREFECTURE_NAME_INDEX = 6
@@ -51,9 +52,9 @@ module Yubin
       def generate_tmpfile(input, destination)
         CSV.foreach(input, 'r:Shift_JIS:UTF-8') do |row|
           data = self.parse(row)
-          filename = File.join(destination, data.keys.first[0..2] + ".txt")
+          filename = File.join(destination, data.keys.first[0..2] + ".yml")
           FileUtils.mkdir_p(File.dirname(filename))
-          File.open(filename, "a") {|f| f.write JSON.generate(data) + "\n" }
+          File.open(filename, "a") {|f| f.write YAML.dump(data) }
         end
       end
 
