@@ -10,6 +10,7 @@ module Yubin
     require 'yaml'
 
     ZIP_CODE_INDEX = 2
+    PREFECTURE_CODE_INDEX = 0
     PREFECTURE_NAME_INDEX = 6
     PREFECTURE_NAME_KANA_INDEX = 3
     CITY_NAME_INDEX = 7
@@ -60,6 +61,7 @@ module Yubin
 
       def parse(data = [])
         zipcode = data[ZIP_CODE_INDEX]
+        prefecture_code = data[PREFECTURE_CODE_INDEX][0..1].to_i
         prefecture = data[PREFECTURE_NAME_INDEX]
         prefecture_kana = ::Yubin::Katakana.to_zenkaku(data[PREFECTURE_NAME_KANA_INDEX])
         city = data[CITY_NAME_INDEX]
@@ -75,7 +77,7 @@ module Yubin
           others_kana = '' if f == others_kana
         end
         others_kana = ::Yubin::Katakana.to_zenkaku(others_kana) unless others_kana == ''
-        {zipcode => [prefecture, prefecture_kana, city, city_kana, others, others_kana]}
+        {zipcode => [prefecture_code, prefecture, prefecture_kana, city, city_kana, others, others_kana]}
         # "\"#{zipcode}\":[\"#{prefecture}\",\"#{prefecture_kana}\",\"#{city}\",\"#{city_kana}\",\"#{others}\",\"#{others_kana}\"]"
       end
     end

@@ -42,7 +42,7 @@ describe Yubin::JsonDictionary do
   describe ".parse" do
     context "" do
       let(:data) { ["37201", "760  ", "7600000", "ｶｶﾞﾜｹﾝ", "ﾀｶﾏﾂｼ", "ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ", "香川県", "高松市", "以下に掲載がない場合", "0", "0", "0", "0", "0", "0"] }
-      it { Yubin::JsonDictionary.parse(data).should == {"7600000" => ['香川県', 'カガワケン', '高松市', 'タカマツシ', '', '']} }
+      it { Yubin::JsonDictionary.parse(data).should == {"7600000" => [37, '香川県', 'カガワケン', '高松市', 'タカマツシ', '', '']} }
     end
   end
 end
