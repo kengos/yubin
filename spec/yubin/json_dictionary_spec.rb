@@ -25,10 +25,16 @@ describe Yubin::JsonDictionary do
   describe ".unzip" do
     let(:filename) { fixture_path('37kagawa.zip') }
     before {
-      FileUtils.rm_r(basepath) if FileTest.exist?(basepath)
       Yubin::JsonDictionary.unzip(filename, basepath)
     }
     it { FileTest.exist?(basepath + '/' + '37kagawa.csv').should be_true }
+  end
+
+  describe ".generate" do
+    let(:input_dir) { fixture_path('yaml') }
+    before { Yubin::JsonDictionary.generate(input_dir, basepath) }
+    it { FileTest.exist?(basepath + '/760.json').should be_true }
+    it { JSON.parse(File.read(basepath + '/760.json'))['7600002'].should == [37, "香川県", "カガワケン", "高松市", "タカマツシ", "茜町", "アカネチョウ"] }
   end
 
   describe ".generate_tmpfile" do
@@ -36,7 +42,7 @@ describe Yubin::JsonDictionary do
     before {
       Yubin::JsonDictionary.generate_tmpfile(filename, basepath)
     }
-    it { FileTest.exist?(basepath + '/' + '760.yml').should be_true }
+    it { FileTest.exist?(basepath + '/760.yml').should be_true }
   end
 
   describe ".parse" do

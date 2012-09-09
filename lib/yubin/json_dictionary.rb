@@ -48,6 +48,12 @@ module Yubin
       end
 
       def generate(input_dir, output_dir)
+        Dir::glob(input_dir + "/*.yml").each do |file|
+          yaml = YAML.load(File.read(file))
+          filename = File.join(output_dir, File.basename(file).gsub('.yml', '.json'))
+          FileUtils.mkdir_p(File.dirname(filename))
+          File.open(filename, 'w'){|f| f.write JSON.generate(yaml) }
+        end
       end
 
       def generate_tmpfile(input, destination)
@@ -55,7 +61,7 @@ module Yubin
           data = self.parse(row)
           filename = File.join(destination, data.keys.first[0..2] + ".yml")
           FileUtils.mkdir_p(File.dirname(filename))
-          File.open(filename, "a") {|f| f.write YAML.dump(data) }
+          File.open(filename, "a") {|f| f.write data.to_yaml.gsub("---\n", '') }
         end
       end
 
@@ -78,7 +84,6 @@ module Yubin
         end
         others_kana = ::Yubin::Katakana.to_zenkaku(others_kana) unless others_kana == ''
         {zipcode => [prefecture_code, prefecture, prefecture_kana, city, city_kana, others, others_kana]}
-        # "\"#{zipcode}\":[\"#{prefecture}\",\"#{prefecture_kana}\",\"#{city}\",\"#{city_kana}\",\"#{others}\",\"#{others_kana}\"]"
       end
     end
   end
