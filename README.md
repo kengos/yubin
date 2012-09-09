@@ -1,24 +1,32 @@
 # Yubin
 
-TODO: Write a gem description
+Japanese:
+
+  郵便事業株式会社よりダウンロードした郵便番号辞書を元にYAML, JSONファイルを生成します。
+
+  YAMLファイル, JSONファイルは郵便番号の先頭3桁 + '.yml' or '.json'で生成されます。
+
+  事業所別は未対応です。
+
+  各yaml, jsonデータはvendor以下に生成済みのものが設置してあります。
+
+  http://www.post.japanpost.jp/zipcode/dl/kogaki-zip.html
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'yubin'
+    gem 'yubin', :git => 'git://github.com/kengos/yubin.git'
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install yubin
-
 ## Usage
 
-TODO: Write usage instructions here
+Install Json files:
+
+    $ rails g yubin:install
 
 ## Contributing
 
