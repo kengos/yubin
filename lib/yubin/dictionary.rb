@@ -1,7 +1,7 @@
 # coding: utf-8
 
 module Yubin
-  class JsonDictionary
+  class Dictionary
     require 'net/http'
     require 'uri'
     require 'zip/zip'
@@ -22,10 +22,10 @@ module Yubin
 
     class << self
       def generate(uri, output_dir)
-        # zipfile = File.join(output_dir, uri.split('/').last)
-        # self.download(uri, zipfile)
-        # unzipfile = self.unzip(zipfile, output_dir)
-        # self.generate_yaml()
+        zipfile = self.download(uri, output_dir)
+        csvfile = self.unzip(zipfile, output_dir)
+        self.generate_yaml(csvfile, output_dir + '/yaml')
+        self.generate_json(output_dir + '/yaml', output_dir + '/json')
       end
 
       def download(uri, output_dir)

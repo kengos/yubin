@@ -1,7 +1,7 @@
 require "yubin/version"
 
 module Yubin
-  autoload :JsonDictionary, 'yubin/json_dictionary'
+  autoload :Dictionary, 'yubin/dictionary'
   autoload :Parser, 'yubin/parser'
   autoload :Katakana, 'yubin/katakana'
 end
