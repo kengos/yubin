@@ -91,7 +91,7 @@ module Yubin
           others_kana = '' if f == others_kana
         end
         others_kana = ::Yubin::Katakana.to_zenkaku(others_kana) unless others_kana == ''
-        {zipcode => [prefecture_code, prefecture, prefecture_kana, city, city_kana, others, others_kana]}
+        {zipcode.to_s => [prefecture_code, prefecture, prefecture_kana, city, city_kana, others, others_kana]}
       end
     end
   end
