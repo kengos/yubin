@@ -7,7 +7,7 @@ module Yubin
       source_root File.expand_path('../../../../vendor/assets/javascripts/yubin', __FILE__)
 
       def copy_initializers
-        FileUtils.cp_r source_root, 'app/assets/javascripts/'
+        FileUtils.cp_r self.source_root, 'app/assets/javascripts/'
       end
 
     end
