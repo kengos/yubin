@@ -7,7 +7,7 @@ namespace :yubin do
     uri = ENV['URI'] || 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/ken_all.zip'
     output_dir = ENV['TO']
     if output_dir.nil?
-      puts "Usage: rake yubin:generate TO='./tmp'"
+      puts "Usage: rake yubin:generate TO='./tmp/yubin'"
     else
       ::Yubin::Dictionary.generate(uri, output_dir)
     end

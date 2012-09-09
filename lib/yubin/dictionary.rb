@@ -18,7 +18,7 @@ module Yubin
     OTHERS_INDEX = 8
     OTHERS_KANA_INDEX = 5
     IGNORE_WORDS = %w(以下に掲載がない場合)
-    IGNORE_WORDS_KANA = %w(ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ)
+    IGNORE_WORDS_KANA = %w(イカニケイサイガナイバアイ)
 
     class << self
       def generate(uri, output_dir)
@@ -65,21 +65,33 @@ module Yubin
       end
 
       def generate_yaml(input, output_dir)
-        CSV.foreach(input, 'r:Shift_JIS:UTF-8') do |row|
-          data = self.parse(row)
-          filename = File.join(output_dir, data.keys.first[0..2] + ".yml")
-          FileUtils.mkdir_p(File.dirname(filename))
-          File.open(filename, "a") {|f| f.write data.to_yaml.gsub("---\n", '') }
+        FileUtils.mkdir_p(output_dir)
+        datas = {}
+        counter = 0
+        File.open(input, 'r:Shift_JIS:UTF-8') do |file|
+          file.each do |line|
+            data = self.parse(CSV.parse(::Yubin::Katakana.to_zenkaku(line)).first)
+            filename = data.keys.first[0..2] + '.yml'
+            counter += 1
+            datas[filename] ||= ''
+            datas[filename] << data.to_yaml.gsub("---\n", '')
+            if counter == 5000
+              write_to_yaml(datas, output_dir)
+              counter = 0
+              datas = {}
+            end
+          end
         end
+        write_to_yaml(datas, output_dir)
       end
 
       def parse(data = [])
         zipcode = data[ZIP_CODE_INDEX]
         prefecture_code = data[PREFECTURE_CODE_INDEX][0..1].to_i
         prefecture = data[PREFECTURE_NAME_INDEX]
-        prefecture_kana = ::Yubin::Katakana.to_zenkaku(data[PREFECTURE_NAME_KANA_INDEX])
+        prefecture_kana = data[PREFECTURE_NAME_KANA_INDEX]
         city = data[CITY_NAME_INDEX]
-        city_kana = ::Yubin::Katakana.to_zenkaku(data[CITY_NAME_KANA_INDEX])
+        city_kana = data[CITY_NAME_KANA_INDEX]
         others = data[OTHERS_INDEX]
         others_kana = data[OTHERS_KANA_INDEX]
 
@@ -90,8 +102,15 @@ module Yubin
         IGNORE_WORDS_KANA.each do |f|
           others_kana = '' if f == others_kana
         end
-        others_kana = ::Yubin::Katakana.to_zenkaku(others_kana) unless others_kana == ''
+
         {zipcode.to_s => [prefecture_code, prefecture, prefecture_kana, city, city_kana, others, others_kana]}
+      end
+
+      private
+      def write_to_yaml(datas, output_dir)
+        datas.each_pair do |filename, str|
+          File.open(File.join(output_dir, filename), "a"){|f| f.write str}
+        end
       end
     end
   end
