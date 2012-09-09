@@ -21,33 +21,41 @@ module Yubin
     IGNORE_WORDS_KANA = %w(ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ)
 
     class << self
-      def run
+      def generate(uri, output_dir)
+        # zipfile = File.join(output_dir, uri.split('/').last)
+        # self.download(uri, zipfile)
+        # unzipfile = self.unzip(zipfile, output_dir)
+        # self.generate_yaml()
       end
 
-      def download(uri, destination)
-        FileUtils.mkdir_p(File.dirname(destination))
+      def download(uri, output_dir)
+        output = File.join(output_dir, uri.split('/').last)
+        FileUtils.mkdir_p(File.dirname(output))
         uri = URI.parse(uri)
+
         Net::HTTP.start(uri.host, uri.port) do |http|
           req = Net::HTTP::Get.new(uri.request_uri)
           http.request(req) do |response|
-            File.open(destination, "wb") {|f|
+            File.open(output, "wb") {|f|
               response.read_body {|data| f.write data}
             }
           end
         end
+        output
       end
 
-      def unzip(filename, destination)
-        Zip::ZipFile.open(filename) do |zip_file|
-          zip_file.each { |f|
-            f_path = File.join(destination, f.name.downcase)
-            FileUtils.mkdir_p(File.dirname(f_path))
-            zip_file.extract(f, f_path) unless File.exist?(f_path)
-          }
+      def unzip(zipfile, output_dir)
+        output = ''
+        Zip::ZipFile.open(zipfile) do |zip_file|
+          filename = zip_file.first
+          output = File.join(output_dir, filename.name.downcase)
+          FileUtils.mkdir_p(File.dirname(output))
+          zip_file.extract(filename, output)
         end
+        output
       end
 
-      def generate(input_dir, output_dir)
+      def generate_json(input_dir, output_dir)
         Dir::glob(input_dir + "/*.yml").each do |file|
           yaml = YAML.load(File.read(file))
           filename = File.join(output_dir, File.basename(file).gsub('.yml', '.json'))
@@ -56,10 +64,10 @@ module Yubin
         end
       end
 
-      def generate_tmpfile(input, destination)
+      def generate_yaml(input, output_dir)
         CSV.foreach(input, 'r:Shift_JIS:UTF-8') do |row|
           data = self.parse(row)
-          filename = File.join(destination, data.keys.first[0..2] + ".yml")
+          filename = File.join(output_dir, data.keys.first[0..2] + ".yml")
           FileUtils.mkdir_p(File.dirname(filename))
           File.open(filename, "a") {|f| f.write data.to_yaml.gsub("---\n", '') }
         end

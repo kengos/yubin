@@ -3,6 +3,9 @@ require 'rspec'
 
 require File.expand_path(File.dirname(__FILE__) + '/../lib/yubin')
 
+require 'webmock'
+require 'webmock/rspec'
+
 RSpec.configure do |config|
   config.mock_with :rspec
   config.treat_symbols_as_metadata_keys_with_true_values = true

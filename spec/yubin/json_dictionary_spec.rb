@@ -3,52 +3,62 @@
 require 'spec_helper'
 
 describe Yubin::JsonDictionary do
-  let(:basepath) { TMP_DIR + '/tests' }
+  let(:output_dir) { TMP_DIR + '/tests' }
 
   before {
-    FileUtils.rm_r(basepath) if FileTest.exist?(basepath)
+    FileUtils.rm_r(output_dir) if FileTest.exist?(output_dir)
   }
 
   after {
-    FileUtils.rm_r(basepath) if FileTest.exist?(basepath)
+    FileUtils.rm_r(output_dir) if FileTest.exist?(output_dir)
   }
 
   describe ".download" do
-    let(:filename) { basepath + '/' + 'test.zip' }
     let(:uri) { 'http://www.post.japanpost.jp/zipcode/dl/kogaki/zip/37kagawa.zip' }
     before {
-      Yubin::JsonDictionary.download(uri, filename) 
+      stub_request(:get, uri).to_return(
+        :status => 200,
+        :body => lambda {|request| File.new(fixture_path('37kagawa.zip'))}
+      )
     }
-    it { FileTest.exist?(filename).should be_true }
+    it 'should download 37kagawa.zip' do
+      output = Yubin::JsonDictionary.download(uri, output_dir)
+      output.should eql File.join(output_dir, '37kagawa.zip')
+      FileTest.should be_exist(output)
+    end
   end
 
   describe ".unzip" do
     let(:filename) { fixture_path('37kagawa.zip') }
-    before {
-      Yubin::JsonDictionary.unzip(filename, basepath)
-    }
-    it { FileTest.exist?(basepath + '/' + '37kagawa.csv').should be_true }
+    it 'should unzip 37kagawa.zip' do
+      output = Yubin::JsonDictionary.unzip(filename, output_dir)
+      output.should eql File.join(output_dir, '37kagawa.csv')
+      FileTest.should be_exist(output)
+    end
   end
 
-  describe ".generate" do
+  describe ".generate_json" do
     let(:input_dir) { fixture_path('yaml') }
-    before { Yubin::JsonDictionary.generate(input_dir, basepath) }
-    it { FileTest.exist?(basepath + '/760.json').should be_true }
-    it { JSON.parse(File.read(basepath + '/760.json'))['7600002'].should == [37, "香川県", "カガワケン", "高松市", "タカマツシ", "茜町", "アカネチョウ"] }
+    let(:expect_file) { File.join(output_dir, '760.json') }
+    it 'should generate json file from yaml files' do
+      Yubin::JsonDictionary.generate_json(input_dir, output_dir)
+      FileTest.should be_exist(expect_file)
+      JSON.parse(File.read(expect_file))['7600002'].should == [37, "香川県", "カガワケン", "高松市", "タカマツシ", "茜町", "アカネチョウ"]
+    end
   end
 
-  describe ".generate_tmpfile" do
+  describe ".generate_yaml" do
     let(:filename) { fixture_path('37kagawa.csv') }
-    before {
-      Yubin::JsonDictionary.generate_tmpfile(filename, basepath)
-    }
-    it { FileTest.exist?(basepath + '/760.yml').should be_true }
+    let(:expect_file) { File.join(output_dir, '760.yml') }
+    it 'should generate yaml file from csv file' do
+      Yubin::JsonDictionary.generate_yaml(filename, output_dir)
+      FileTest.should be_exist(expect_file)
+      YAML.load(File.read(expect_file))["7600064"].should == [37, "香川県", "カガワケン", "高松市", "タカマツシ", "朝日新町", "アサヒシンマチ"]
+    end
   end
 
   describe ".parse" do
-    context "" do
-      let(:data) { ["37201", "760  ", "7600000", "ｶｶﾞﾜｹﾝ", "ﾀｶﾏﾂｼ", "ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ", "香川県", "高松市", "以下に掲載がない場合", "0", "0", "0", "0", "0", "0"] }
-      it { Yubin::JsonDictionary.parse(data).should == {"7600000" => [37, '香川県', 'カガワケン', '高松市', 'タカマツシ', '', '']} }
-    end
+    let(:data) { ["37201", "760  ", "7600000", "ｶｶﾞﾜｹﾝ", "ﾀｶﾏﾂｼ", "ｲｶﾆｹｲｻｲｶﾞﾅｲﾊﾞｱｲ", "香川県", "高松市", "以下に掲載がない場合", "0", "0", "0", "0", "0", "0"] }
+    it { Yubin::JsonDictionary.parse(data).should == {"7600000" => [37, '香川県', 'カガワケン', '高松市', 'タカマツシ', '', '']} }
   end
 end

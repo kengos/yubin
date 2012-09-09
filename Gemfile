@@ -9,6 +9,7 @@ group :development, :test do
   gem 'tapp', :git => 'git://github.com/esminc/tapp.git'
 
   gem 'rspec-rails'
+  gem 'webmock'
   gem 'guard'
   gem 'guard-rspec'
   gem 'fuubar'
